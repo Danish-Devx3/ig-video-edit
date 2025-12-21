@@ -48,17 +48,17 @@ export function InstagramVideoForm() {
     try {
       console.log("getting video info", postUrl);
       const videoInfo = await getVideoInfo({ postUrl });
-  
+
       const { filename, videoUrl } = videoInfo;
-  
+
       console.log("videoUrl:", videoUrl);
-  
+
       await downloadFile(videoUrl, filename);
     } catch (error: any) {
       console.log(error);
     }
   }
-  
+
   return (
     <Form {...form}>
       <form
@@ -99,18 +99,27 @@ export function InstagramVideoForm() {
             )}
             Download
           </Button>
-          
+
 
         </div>
-          <Link href={{pathname: "/edit-video", query: { postUrl: form.getValues().postUrl }}} className="ml-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+
+        {form.watch("postUrl") && (
+          <Link
+            href={{
+              pathname: "/edit-video",
+              query: { postUrl: form.getValues().postUrl },
+            }}
+            className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition-all"
+          >
             Edit Video
           </Link>
-        <p className="text-muted-foreground text-center text-xs">
+        )}
+        <p className="text-muted-foreground text-center text-xs mt-4">
           If the download opens a new page, right click the video and then click{" "}
           Save as video.
         </p>
       </form>
-    </Form>
+    </Form >
   );
 }
 
