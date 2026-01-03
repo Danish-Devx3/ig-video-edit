@@ -6,8 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Image as ImageIcon, Crop, Type, Download, Trash2, Move } from "lucide-react";
+import { Image as ImageIcon, Crop, Type, Download, Trash2, Move, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 type Overlay = {
   id: string;
@@ -15,9 +17,9 @@ type Overlay = {
   content: string;
   x: number;
   y: number;
-  width?: number;
+  width?: number; // For images
   height?: number;
-  style?: React.CSSProperties;
+  style?: React.CSSProperties; // For text
 };
 
 export default function EditVideo() {
@@ -29,10 +31,38 @@ export default function EditVideo() {
   const [overlays, setOverlays] = useState<Overlay[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   // Tools state
   const [cropMode, setCropMode] = useState(false);
   const [newText, setNewText] = useState("New Text");
+
+  // Refs
+  const ffmpegRef = useRef(new FFmpeg());
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Load FFmpeg
+  useEffect(() => {
+    const load = async () => {
+      const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+      const ffmpeg = ffmpegRef.current;
+
+      // Check if already loaded
+      if (ffmpeg.loaded) return;
+
+      try {
+        await ffmpeg.load({
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+        });
+        console.log("FFmpeg loaded");
+      } catch (error) {
+        console.error("Failed to load FFmpeg:", error);
+      }
+    };
+    load();
+  }, []);
 
   // Fetch Video Logic
   useEffect(() => {
@@ -41,13 +71,8 @@ export default function EditVideo() {
     const fetchVideo = async () => {
       try {
         setLoading(true);
-        // In a real app, you might want to pass the video URL directly if known, 
-        // to avoid re-fetching info. But sticking to existing pattern:
         const videoInfo = await getVideoInfo({ postUrl: url });
         const { videoUrl } = videoInfo;
-
-        // Resolve redirect if needed (simulated by just using the proxy or direct)
-        // Using the proxy as per previous file:
         const finalUrl = `/api/proxy?url=${encodeURIComponent(videoUrl)}`;
         setVideoSrc(finalUrl);
       } catch (e) {
@@ -109,7 +134,7 @@ export default function EditVideo() {
     if (selectedId === id) setSelectedId(null);
   };
 
-  // Drag logic (simplified)
+  // Drag logic
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
 
@@ -133,6 +158,145 @@ export default function EditVideo() {
 
   const handleMouseUp = () => {
     isDragging.current = false;
+  };
+
+  // Export Logic
+  const handleExport = async () => {
+    const ffmpeg = ffmpegRef.current;
+    if (!ffmpeg.loaded) {
+      alert("FFmpeg is still loading, please wait...");
+      return;
+    }
+    if (!videoSrc) return;
+    if (!videoRef.current) return;
+
+    setProcessing(true);
+
+    try {
+      // 1. Write video file
+      // We need to fetch the video blob first
+      const videoData = await fetchFile(videoSrc);
+      await ffmpeg.writeFile("input.mp4", videoData);
+
+      // 2. Prepare Font (Roboto) for text
+      // Using a basic font from a reliable source or fallback
+      const fontUrl = "https://raw.githubusercontent.com/ffmpegwasm/testdata/master/arial.ttf";
+      await ffmpeg.writeFile("font.ttf", await fetchFile(fontUrl));
+
+      // 3. Build Filter Complex
+      let filterChain = [];
+      let inputCount = 1; // 0 is video
+      const inputs = ["-i", "input.mp4"];
+
+      // Process Overlays
+      // We need to map UI coordinates to Video coordinates
+      // Video Intrinsic Dimensions
+      const vidW = videoRef.current.videoWidth;
+      const vidH = videoRef.current.videoHeight;
+      // Displayed Dimensions
+      const dispW = videoRef.current.clientWidth;
+      const dispH = videoRef.current.clientHeight;
+
+      const scaleX = vidW / dispW;
+      const scaleY = vidH / dispH;
+
+      // Track the last label in the filter chain
+      let lastLabel = "0:v";
+
+      // If Crop Mode is active, apply crop first (as per visual inset-10)
+      // inset-10 corresponds to 40px (10 * 4px) from each side in Tailwind
+      // But 40px is in Display pixels. We must scale it.
+      if (cropMode) {
+        const cropInsetPx = 40;
+        const realCropX = cropInsetPx * scaleX;
+        const realCropY = cropInsetPx * scaleY;
+        const realCropW = vidW - (realCropX * 2);
+        const realCropH = vidH - (realCropY * 2);
+
+        const cropLabel = `cropped`;
+        filterChain.push(`[${lastLabel}]crop=${realCropW}:${realCropH}:${realCropX}:${realCropY}[${cropLabel}]`);
+        lastLabel = cropLabel;
+      }
+
+      for (const overlay of overlays) {
+        const x = Math.max(0, overlay.x * scaleX);
+        const y = Math.max(0, overlay.y * scaleY);
+
+        if (overlay.type === "image") {
+          // Write image to FS
+          const imgFilename = `img_${overlay.id}.png`;
+          await ffmpeg.writeFile(imgFilename, await fetchFile(overlay.content));
+          inputs.push("-i", imgFilename);
+
+          const imgLabel = `img${inputCount}`;
+          const scaledImgLabel = `scaled${inputCount}`;
+
+          // Image Scale (width provided in UI, auto height)
+          const infoW = (overlay.width || 150) * scaleX;
+
+          // Add scale filter just for this image input
+          // Note: using [inputIndex:v]
+          filterChain.push(`[${inputCount}:v]scale=${infoW}:-1[${scaledImgLabel}]`);
+
+          // Add overlay filter
+          const nextLabel = `v${inputCount}`;
+          filterChain.push(`[${lastLabel}][${scaledImgLabel}]overlay=x=${x}:y=${y}[${nextLabel}]`);
+
+          lastLabel = nextLabel;
+          inputCount++;
+        } else if (overlay.type === "text") {
+          // Text Overlay (drawtext)
+          // Font size scaling
+          // Base font size in UI is roughly 24px? or style.
+          const uiFontSize = parseInt(overlay.style?.fontSize?.toString().replace("px", "") || "24");
+          const realFontSize = uiFontSize * scaleX; // Assuming uniform scale mostly
+          const textContent = overlay.content.replace(/:/g, "\\:").replace(/'/g, ""); // Basic escape
+          const color = overlay.style?.color || "white";
+
+          // drawtext uses the same input stream, modifies it
+          const nextLabel = `t${overlay.id.substring(0, 4)}`;
+          filterChain.push(`[${lastLabel}]drawtext=fontfile=font.ttf:text='${textContent}':fontcolor=${color}:fontsize=${realFontSize}:x=${x}:y=${y}[${nextLabel}]`);
+          lastLabel = nextLabel;
+        }
+      }
+
+      // Map the final label to output
+      const outputOptions = [];
+      if (filterChain.length > 0) {
+        outputOptions.push("-filter_complex", filterChain.join(";"));
+        outputOptions.push("-map", `[${lastLabel}]`);
+        // We also need to map audio from original if not lost? 
+        // Crop/Overlay usually keeps audio if we don't touch it, but we need to map it explicitly if using filter_complex for video
+        // [0:a] might exist. Coping audio:
+        outputOptions.push("-map", "0:a");
+        // Note: if 0:a doesn't exist (silent video), this might fail. 
+        // Ideally checking, but for now assuming audio exists or ignoring error?
+        // -c:a copy 
+      }
+
+      // Run FFmpeg
+      console.log("Running FFmpeg with:", ...inputs, ...outputOptions, "output.mp4");
+      await ffmpeg.exec([...inputs, ...outputOptions, "-c:a", "copy", "output.mp4"]);
+
+      // 4. Read result
+      const data = await ffmpeg.readFile("output.mp4");
+      const dataBlob = new Blob([data], { type: "video/mp4" });
+      const objectUrl = URL.createObjectURL(dataBlob);
+
+      // Download
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = "edited_video.mp4";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+    } catch (e) {
+      console.error("Export failed:", e);
+      alert("Export failed. See console for details.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -202,8 +366,13 @@ export default function EditVideo() {
           ))}
         </div>
 
-        <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700">
-          <Download size={18} /> Export Video
+        <Button
+          className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
+          onClick={handleExport}
+          disabled={processing || isPending || !videoSrc}
+        >
+          {processing ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
+          {processing ? "Exporting..." : "Export Video"}
         </Button>
       </aside>
 
@@ -212,16 +381,19 @@ export default function EditVideo() {
         {loading || isPending ? (
           <div className="animate-pulse text-slate-500">Loading Video...</div>
         ) : videoSrc ? (
-          <div className="relative group shadow-2xl overflow-hidden border border-slate-800 bg-black"
+          <div
+            ref={containerRef}
+            className="relative group shadow-2xl overflow-hidden border border-slate-800 bg-black inline-block"
             style={{
-              // Simple simulated crop using CSS clip-path or simple container masking could go here
-              // For now, just showing the video container
+              // Ensure the container fits the content loosely but the content defines the size
             }}
           >
             <video
+              ref={videoRef}
               src={videoSrc}
               controls
-              className={cn("max-h-[80vh] w-auto", cropMode && "opacity-50")}
+              className={cn("max-h-[80vh] w-auto block", cropMode && "opacity-50")}
+              crossOrigin="anonymous"
             />
 
             {/* Crop Overlay (Visual Only) */}
@@ -246,6 +418,7 @@ export default function EditVideo() {
                   color: overlay.style?.color,
                   fontSize: overlay.style?.fontSize,
                   fontWeight: overlay.style?.fontWeight,
+                  whiteSpace: "nowrap"
                 }}
                 onMouseDown={(e) => handleMouseDown(e, overlay.id)}
               >
