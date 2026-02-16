@@ -59,7 +59,7 @@ export const fetchReelIdFromShareURL = async (shareUrl: string): Promise<string>
 
     console.log("Final URL after redirects:", response.url);
 
-    const match = response.url.match(/reel\/([a-zA-Z0-9_-]+)/);
+    const match = response.url.match(/reels?\/([a-zA-Z0-9_-]+)/);
     // console.log("match:", match);
 
     if (!match || !match[1]) {
