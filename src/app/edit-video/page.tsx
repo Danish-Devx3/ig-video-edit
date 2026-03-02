@@ -520,7 +520,7 @@ export default function EditVideo() {
     return handles.map((h) => (
       <div
         key={h.pos}
-        className="absolute w-3 h-3 rounded-sm bg-violet-500 border-2 border-white shadow-lg z-50 transition-transform hover:scale-125"
+        className="absolute w-3 h-3 rounded-sm bg-primary border-2 border-primary-foreground shadow-lg z-50 transition-transform hover:scale-125"
         style={{ ...h.style, position: "absolute", cursor: h.cursor }}
         onMouseDown={(e) => handleResizeMouseDown(e, overlayId, h.pos)}
       />
@@ -530,34 +530,34 @@ export default function EditVideo() {
   // ─── Render ──────────────────────────────────────────────────────
   return (
     <div
-      className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden"
+      className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-background text-foreground overflow-hidden"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
       {/* ══════════ LEFT SIDEBAR ══════════ */}
-      <aside className="w-72 border-r border-slate-800/60 bg-slate-900/80 backdrop-blur-xl flex flex-col">
+      <aside className="w-72 border-r border-border/60 bg-card/80 backdrop-blur-xl flex flex-col">
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-slate-800/60">
+        <div className="p-4 border-b border-border/60">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
               <Sparkles size={16} className="text-white" />
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-tight">Video Editor</h2>
-              <p className="text-[10px] text-slate-500">Edit &amp; Export</p>
+              <p className="text-[10px] text-muted-foreground">Edit &amp; Export</p>
             </div>
           </div>
 
           {/* Tab Switcher */}
-          <div className="flex gap-1 p-0.5 bg-slate-800/60 rounded-lg">
+          <div className="flex gap-1 p-0.5 bg-muted/60 rounded-lg">
             <button
               onClick={() => setSidebarTab("tools")}
               className={cn(
                 "flex-1 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
                 sidebarTab === "tools"
-                  ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
-                  : "text-slate-400 hover:text-slate-300"
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Layers size={12} className="inline mr-1" />
@@ -568,8 +568,8 @@ export default function EditVideo() {
               className={cn(
                 "flex-1 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
                 sidebarTab === "properties"
-                  ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
-                  : "text-slate-400 hover:text-slate-300"
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Settings2 size={12} className="inline mr-1" />
@@ -592,7 +592,7 @@ export default function EditVideo() {
                     "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all duration-200",
                     cropMode
                       ? "bg-amber-500/10 border-amber-500/40 text-amber-400"
-                      : "bg-slate-800/40 border-slate-700/40 text-slate-400 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-600"
+                      : "bg-muted/40 border-border/40 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border"
                   )}
                   onClick={() => {
                     const next = !cropMode;
@@ -605,7 +605,7 @@ export default function EditVideo() {
                   <span className="text-[10px] font-medium">{cropMode ? "Apply Crop" : "Crop"}</span>
                 </button>
                 <label
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-slate-800/40 border-slate-700/40 text-slate-400 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-600 transition-all duration-200 cursor-pointer"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-muted/40 border-border/40 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border transition-all duration-200 cursor-pointer"
                 >
                   <ImageIcon size={20} />
                   <span className="text-[10px] font-medium">Add Image</span>
@@ -616,7 +616,7 @@ export default function EditVideo() {
 
             {/* Add Text */}
             <div>
-              <Label className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold mb-2 block">
+              <Label className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-2 block">
                 Add Text Overlay
               </Label>
               <div className="space-y-2">
@@ -624,23 +624,23 @@ export default function EditVideo() {
                   value={newText}
                   onChange={(e) => setNewText(e.target.value)}
                   placeholder="Enter text..."
-                  className="bg-slate-800/60 border-slate-700/50 text-sm focus:border-violet-500/50 focus:ring-violet-500/20 placeholder:text-slate-600"
+                  className="bg-muted/60 border-border/50 text-sm focus:border-primary/50 focus:ring-primary/20 placeholder:text-muted-foreground"
                 />
                 {/* Font Picker for new text */}
                 <div className="relative">
                   <button
                     onClick={() => setFontDropdownOpen(!fontDropdownOpen)}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-md bg-slate-800/60 border border-slate-700/50 text-sm text-slate-300 hover:border-slate-600 transition-colors"
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-md bg-muted/60 border border-border/50 text-sm text-foreground hover:border-border transition-colors"
                   >
                     <span className="truncate">Arial</span>
                     <ChevronDown size={14} className={cn("transition-transform", fontDropdownOpen && "rotate-180")} />
                   </button>
                   {fontDropdownOpen && (
-                    <div className="absolute z-50 mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-2xl shadow-black/40 overflow-hidden max-h-48 overflow-y-auto">
+                    <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-lg shadow-2xl overflow-hidden max-h-48 overflow-y-auto">
                       {FONT_OPTIONS.map((font) => (
                         <button
                           key={font.name}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-violet-600/20 text-slate-300 hover:text-white transition-colors"
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-primary/20 text-foreground hover:text-foreground transition-colors"
                           style={{ fontFamily: font.family }}
                           onClick={() => {
                             setFontDropdownOpen(false);
@@ -677,7 +677,7 @@ export default function EditVideo() {
                 </div>
                 <Button
                   onClick={addTextOverlay}
-                  className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white shadow-lg shadow-violet-600/20 border-0 gap-2"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg border-0 gap-2"
                 >
                   <Plus size={16} />
                   Add Text
@@ -687,12 +687,12 @@ export default function EditVideo() {
 
             {/* Layers */}
             <div>
-              <Label className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold mb-2 block">
+              <Label className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mb-2 block">
                 Layers ({overlays.length})
               </Label>
               <div className="space-y-1">
                 {overlays.length === 0 && (
-                  <div className="text-xs text-slate-600 text-center py-4 border border-dashed border-slate-800 rounded-lg">
+                  <div className="text-xs text-muted-foreground/60 text-center py-4 border border-dashed border-border rounded-lg">
                     No overlays yet. Add text or images above.
                   </div>
                 )}
@@ -702,20 +702,20 @@ export default function EditVideo() {
                     className={cn(
                       "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all duration-150 group",
                       selectedId === overlay.id
-                        ? "bg-violet-600/15 border border-violet-500/30"
-                        : "bg-slate-800/30 border border-transparent hover:bg-slate-800/60 hover:border-slate-700/40"
+                        ? "bg-primary/15 border border-primary/30"
+                        : "bg-muted/30 border border-transparent hover:bg-muted/60 hover:border-border/40"
                     )}
                     onClick={() => { setSelectedId(overlay.id); setSidebarTab("properties"); }}
                   >
-                    <GripVertical size={12} className="text-slate-600 flex-shrink-0" />
+                    <GripVertical size={12} className="text-muted-foreground/40 flex-shrink-0" />
 
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
                       {overlay.type === "text" ? (
-                        <Type size={13} className="text-violet-400 flex-shrink-0" />
+                        <Type size={13} className="text-primary flex-shrink-0" />
                       ) : (
                         <ImageIcon size={13} className="text-emerald-400 flex-shrink-0" />
                       )}
-                      <span className="truncate text-xs text-slate-300">
+                      <span className="truncate text-xs text-foreground">
                         {overlay.type === "text" ? overlay.content : "Image"}
                       </span>
                     </div>
@@ -725,9 +725,9 @@ export default function EditVideo() {
                       onClick={(e) => { e.stopPropagation(); toggleVisibility(overlay.id); }}
                     >
                       {overlay.visible ? (
-                        <Eye size={12} className="text-slate-500" />
+                        <Eye size={12} className="text-muted-foreground" />
                       ) : (
-                        <EyeOff size={12} className="text-slate-600" />
+                        <EyeOff size={12} className="text-muted-foreground/60" />
                       )}
                     </button>
                     <button
@@ -752,19 +752,19 @@ export default function EditVideo() {
                 <div className="flex items-center gap-2">
                   <div className={cn(
                     "w-6 h-6 rounded-md flex items-center justify-center",
-                    selectedOverlay.type === "text" ? "bg-violet-500/20" : "bg-emerald-500/20"
+                    selectedOverlay.type === "text" ? "bg-primary/20" : "bg-emerald-500/20"
                   )}>
                     {selectedOverlay.type === "text" ? (
-                      <Type size={12} className="text-violet-400" />
+                      <Type size={12} className="text-primary" />
                     ) : (
                       <ImageIcon size={12} className="text-emerald-400" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-slate-200 truncate">
+                    <p className="text-xs font-semibold text-foreground truncate">
                       {selectedOverlay.type === "text" ? selectedOverlay.content : "Image Overlay"}
                     </p>
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-[10px] text-muted-foreground">
                       {Math.round(selectedOverlay.width)} × {Math.round(selectedOverlay.height)}px
                     </p>
                   </div>
@@ -775,7 +775,7 @@ export default function EditVideo() {
                   <>
                     {/* Content */}
                     <div>
-                      <Label className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 block">Content</Label>
+                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block">Content</Label>
                       <Input
                         value={selectedOverlay.content}
                         onChange={(e) => {
@@ -783,17 +783,17 @@ export default function EditVideo() {
                           const { w, h } = measureText(text, selectedOverlay.fontFamily, selectedOverlay.fontSize, selectedOverlay.fontWeight);
                           updateOverlay(selectedOverlay.id, { content: text, width: w, height: h });
                         }}
-                        className="bg-slate-800/60 border-slate-700/50 text-sm"
+                        className="bg-muted/60 border-border/50 text-sm"
                       />
                     </div>
 
                     {/* Font Family */}
                     <div>
-                      <Label className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 block">Font Family</Label>
+                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block">Font Family</Label>
                       <div className="relative">
                         <button
                           onClick={() => setPropsFontDropdownOpen(!propsFontDropdownOpen)}
-                          className="w-full flex items-center justify-between px-3 py-2 rounded-md bg-slate-800/60 border border-slate-700/50 text-sm text-slate-300 hover:border-slate-600 transition-colors"
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-md bg-muted/60 border border-border/50 text-sm text-foreground hover:border-border transition-colors"
                         >
                           <span className="truncate" style={{ fontFamily: selectedOverlay.fontFamily }}>
                             {selectedOverlay.fontName}
@@ -801,13 +801,13 @@ export default function EditVideo() {
                           <ChevronDown size={14} className={cn("transition-transform flex-shrink-0", propsFontDropdownOpen && "rotate-180")} />
                         </button>
                         {propsFontDropdownOpen && (
-                          <div className="absolute z-50 mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-2xl shadow-black/40 overflow-hidden max-h-48 overflow-y-auto">
+                          <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-lg shadow-2xl overflow-hidden max-h-48 overflow-y-auto">
                             {FONT_OPTIONS.map((font) => (
                               <button
                                 key={font.name}
                                 className={cn(
-                                  "w-full text-left px-3 py-2 text-sm hover:bg-violet-600/20 transition-colors",
-                                  selectedOverlay.fontName === font.name ? "bg-violet-600/10 text-violet-300" : "text-slate-300 hover:text-white"
+                                  "w-full text-left px-3 py-2 text-sm hover:bg-primary/20 transition-colors",
+                                  selectedOverlay.fontName === font.name ? "bg-primary/10 text-primary" : "text-foreground hover:text-foreground"
                                 )}
                                 style={{ fontFamily: font.family }}
                                 onClick={() => {
@@ -827,8 +827,8 @@ export default function EditVideo() {
                     {/* Font Size */}
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
-                        <Label className="text-[10px] text-slate-500 uppercase tracking-wider">Font Size</Label>
-                        <span className="text-xs text-slate-400 tabular-nums">{selectedOverlay.fontSize}px</span>
+                        <Label className="text-[10px] text-muted-foreground uppercase tracking-wider">Font Size</Label>
+                        <span className="text-xs text-foreground/70 tabular-nums">{selectedOverlay.fontSize}px</span>
                       </div>
                       <Slider
                         min={8}
@@ -845,7 +845,7 @@ export default function EditVideo() {
 
                     {/* Font Weight */}
                     <div>
-                      <Label className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 block">Font Weight</Label>
+                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block">Font Weight</Label>
                       <div className="grid grid-cols-3 gap-1">
                         {["normal", "bold", "900"].map((w) => (
                           <button
@@ -857,8 +857,8 @@ export default function EditVideo() {
                             className={cn(
                               "py-1.5 text-xs rounded-md border transition-all",
                               selectedOverlay.fontWeight === w
-                                ? "bg-violet-600/20 border-violet-500/40 text-violet-300"
-                                : "bg-slate-800/40 border-slate-700/40 text-slate-400 hover:bg-slate-800"
+                                ? "bg-primary/20 border-primary/40 text-primary"
+                                : "bg-muted/40 border-border/40 text-muted-foreground hover:bg-muted"
                             )}
                             style={{ fontWeight: w }}
                           >
@@ -870,7 +870,7 @@ export default function EditVideo() {
 
                     {/* Color */}
                     <div>
-                      <Label className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 block">
+                      <Label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block">
                         <Palette size={10} className="inline mr-1" />
                         Color
                       </Label>
@@ -880,7 +880,7 @@ export default function EditVideo() {
                             key={c}
                             className={cn(
                               "w-7 h-7 rounded-lg border-2 transition-all hover:scale-110",
-                              selectedOverlay.color === c ? "border-violet-400 shadow-lg" : "border-slate-700/50"
+                              selectedOverlay.color === c ? "border-primary shadow-lg" : "border-border/50"
                             )}
                             style={{ backgroundColor: c }}
                             onClick={() => updateOverlay(selectedOverlay.id, { color: c })}
@@ -892,12 +892,12 @@ export default function EditVideo() {
                           type="color"
                           value={selectedOverlay.color}
                           onChange={(e) => updateOverlay(selectedOverlay.id, { color: e.target.value })}
-                          className="w-8 h-8 rounded-md border border-slate-700 cursor-pointer bg-transparent"
+                          className="w-8 h-8 rounded-md border border-border cursor-pointer bg-transparent"
                         />
                         <Input
                           value={selectedOverlay.color}
                           onChange={(e) => updateOverlay(selectedOverlay.id, { color: e.target.value })}
-                          className="bg-slate-800/60 border-slate-700/50 text-xs font-mono flex-1"
+                          className="bg-muted/60 border-border/50 text-xs font-mono flex-1"
                         />
                       </div>
                     </div>
@@ -908,8 +908,8 @@ export default function EditVideo() {
                 {/* Opacity */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <Label className="text-[10px] text-slate-500 uppercase tracking-wider">Opacity</Label>
-                    <span className="text-xs text-slate-400 tabular-nums">{Math.round(selectedOverlay.opacity * 100)}%</span>
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider">Opacity</Label>
+                    <span className="text-xs text-foreground/70 tabular-nums">{Math.round(selectedOverlay.opacity * 100)}%</span>
                   </div>
                   <Slider
                     min={0}
@@ -922,27 +922,27 @@ export default function EditVideo() {
 
                 {/* Size */}
                 <div>
-                  <Label className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 block">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block">
                     <Maximize2 size={10} className="inline mr-1" />
                     Size
                   </Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[9px] text-slate-600 mb-0.5 block">Width</label>
+                      <label className="text-[9px] text-muted-foreground/60 mb-0.5 block">Width</label>
                       <Input
                         type="number"
                         value={Math.round(selectedOverlay.width)}
                         onChange={(e) => updateOverlay(selectedOverlay.id, { width: Number(e.target.value) })}
-                        className="bg-slate-800/60 border-slate-700/50 text-xs"
+                        className="bg-muted/60 border-border/50 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="text-[9px] text-slate-600 mb-0.5 block">Height</label>
+                      <label className="text-[9px] text-muted-foreground/60 mb-0.5 block">Height</label>
                       <Input
                         type="number"
                         value={Math.round(selectedOverlay.height)}
                         onChange={(e) => updateOverlay(selectedOverlay.id, { height: Number(e.target.value) })}
-                        className="bg-slate-800/60 border-slate-700/50 text-xs"
+                        className="bg-muted/60 border-border/50 text-xs"
                       />
                     </div>
                   </div>
@@ -950,35 +950,35 @@ export default function EditVideo() {
 
                 {/* Position */}
                 <div>
-                  <Label className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 block">Position</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 block">Position</Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[9px] text-slate-600 mb-0.5 block">X</label>
+                      <label className="text-[9px] text-muted-foreground/60 mb-0.5 block">X</label>
                       <Input
                         type="number"
                         value={Math.round(selectedOverlay.x)}
                         onChange={(e) => updateOverlay(selectedOverlay.id, { x: Number(e.target.value) })}
-                        className="bg-slate-800/60 border-slate-700/50 text-xs"
+                        className="bg-muted/60 border-border/50 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="text-[9px] text-slate-600 mb-0.5 block">Y</label>
+                      <label className="text-[9px] text-muted-foreground/60 mb-0.5 block">Y</label>
                       <Input
                         type="number"
                         value={Math.round(selectedOverlay.y)}
                         onChange={(e) => updateOverlay(selectedOverlay.id, { y: Number(e.target.value) })}
-                        className="bg-slate-800/60 border-slate-700/50 text-xs"
+                        className="bg-muted/60 border-border/50 text-xs"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Reset / Delete */}
-                <div className="flex gap-2 pt-2 border-t border-slate-800/60">
+                <div className="flex gap-2 pt-2 border-t border-border/60">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 text-xs text-slate-400 hover:text-slate-200 gap-1"
+                    className="flex-1 text-xs text-muted-foreground hover:text-foreground gap-1"
                     onClick={() => updateOverlay(selectedOverlay.id, { x: 50, y: 50 })}
                   >
                     <RotateCcw size={12} />
@@ -997,20 +997,20 @@ export default function EditVideo() {
               </>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                <div className="w-12 h-12 rounded-full bg-slate-800/60 flex items-center justify-center mb-3">
-                  <Settings2 size={20} className="text-slate-600" />
+                <div className="w-12 h-12 rounded-full bg-muted/60 flex items-center justify-center mb-3">
+                  <Settings2 size={20} className="text-muted-foreground/40" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">No Selection</p>
-                <p className="text-xs text-slate-600 mt-1">Click an overlay to edit its properties</p>
+                <p className="text-sm text-muted-foreground font-medium">No Selection</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">Click an overlay to edit its properties</p>
               </div>
             )}
           </div>
         )}
 
         {/* Export Button */}
-        <div className="p-4 border-t border-slate-800/60">
+        <div className="p-4 border-t border-border/60">
           <Button
-            className="w-full gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white shadow-lg shadow-violet-600/20 border-0 h-11 font-semibold"
+            className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg border-0 h-11 font-semibold"
             onClick={handleExport}
             disabled={processing || isPending || !videoSrc}
           >
@@ -1035,19 +1035,19 @@ export default function EditVideo() {
         {loading || isPending ? (
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 backdrop-blur flex items-center justify-center">
-                <Loader2 size={28} className="text-violet-400 animate-spin" />
+              <div className="w-16 h-16 rounded-2xl bg-primary/20 backdrop-blur flex items-center justify-center">
+                <Loader2 size={28} className="text-primary animate-spin" />
               </div>
             </div>
             <div className="text-center">
-              <p className="text-sm text-slate-400 font-medium">Loading Video</p>
-              <p className="text-xs text-slate-600 mt-1">Fetching from Instagram...</p>
+              <p className="text-sm text-muted-foreground font-medium">Loading Video</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Fetching from Instagram...</p>
             </div>
           </div>
         ) : videoSrc ? (
           <div
             ref={containerRef}
-            className="relative group shadow-2xl shadow-black/50 overflow-visible border border-slate-800/50 bg-black rounded-lg"
+            className="relative group shadow-2xl overflow-visible border border-border/50 bg-black rounded-lg"
             onClick={() => { setSelectedId(null); }}
           >
             <video
@@ -1139,7 +1139,7 @@ export default function EditVideo() {
                   >
                     {/* Selection Ring + Resize Handles */}
                     {selectedId === overlay.id && (
-                      <div className="absolute -inset-1 border-2 border-violet-500 rounded z-30">
+                      <div className="absolute -inset-1 border-2 border-primary rounded z-30">
                         {/* Resize handles — pointer events MUST be enabled */}
                         {resizeHandles(overlay.id)}
                       </div>
@@ -1182,26 +1182,26 @@ export default function EditVideo() {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className="w-20 h-20 rounded-2xl bg-slate-800/40 border border-slate-700/40 flex items-center justify-center">
-              <ImageIcon size={32} className="text-slate-600" />
+            <div className="w-20 h-20 rounded-2xl bg-muted/40 border border-border/40 flex items-center justify-center">
+              <ImageIcon size={32} className="text-muted-foreground/40" />
             </div>
             <div>
-              <p className="text-sm text-slate-400 font-medium">No Video Loaded</p>
-              <p className="text-xs text-slate-600 mt-1">Go back and enter an Instagram post URL</p>
+              <p className="text-sm text-muted-foreground font-medium">No Video Loaded</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Go back and enter an Instagram post URL</p>
             </div>
           </div>
         )}
 
         {/* Processing Overlay */}
         {processing && (
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl shadow-violet-600/10">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-card/90 border border-border rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
               <div className="relative">
-                <div className="w-16 h-16 rounded-full border-4 border-slate-700 border-t-violet-500 animate-spin" />
+                <div className="w-16 h-16 rounded-full border-4 border-muted border-t-primary animate-spin" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-semibold text-white">{exportProgress || "Processing..."}</p>
-                <p className="text-xs text-slate-500 mt-1">This may take a moment</p>
+                <p className="text-sm font-semibold text-foreground">{exportProgress || "Processing..."}</p>
+                <p className="text-xs text-muted-foreground mt-1">This may take a moment</p>
               </div>
             </div>
           </div>
