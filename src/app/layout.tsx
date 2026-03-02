@@ -27,14 +27,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="h-full overflow-hidden">
       <head>
         <AdSense pId="9504654793147997" />
       </head>
       <body
         className={cn(
           fontSans.variable,
-          "overflow-x-hidden bg-background font-sans antialiased"
+          "h-full overflow-hidden bg-background font-sans antialiased flex flex-col"
         )}
       >
         <ThemeProvider
@@ -44,10 +44,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReactQueryProvider>
+            {/* Navbar — fixed height, never shrinks */}
             <Navbar />
-            <main className="relative h-[calc(100vh-3.5rem)] overflow-hidden">
+            {/* Main — takes all remaining height, clips overflow */}
+            <main className="flex-1 min-h-0 overflow-hidden">
               {children}
             </main>
+            {/* Footer — fixed height, never shrinks */}
             <Footer />
           </ReactQueryProvider>
         </ThemeProvider>
