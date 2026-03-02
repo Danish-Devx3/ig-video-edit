@@ -1,13 +1,4 @@
-import type { Config } from "tailwindcss";
-
-const config = {
-  darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
-} satisfies Config;
-
-export default config;
+// This file is intentionally left empty.
+// Tailwind CSS v4 is configured via globals.css using @import "tailwindcss".
+// No tailwind.config.ts is needed in v4.
+export { };

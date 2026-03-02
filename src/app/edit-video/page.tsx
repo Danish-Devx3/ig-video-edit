@@ -2,7 +2,7 @@
 
 import { useVideoInfo } from "@/services/api/queries";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,7 +70,7 @@ type ActiveTool = "select" | "text" | "image" | "crop";
 type SidebarTab = "tools" | "properties";
 
 // ─── Component ───────────────────────────────────────────────────────
-export default function EditVideo() {
+function EditVideoInner() {
   const searchParams = useSearchParams();
   const url = searchParams.get("postUrl") || "";
   const { mutateAsync: getVideoInfo, isPending } = useVideoInfo();
@@ -92,6 +92,7 @@ export default function EditVideo() {
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("tools");
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
   const [propsFontDropdownOpen, setPropsFontDropdownOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Refs
   const ffmpegRef = useRef<FFmpeg | null>(null);
@@ -487,7 +488,10 @@ export default function EditVideo() {
 
       setExportProgress("Saving file...");
       const data = await ffmpeg.readFile("output.mp4");
-      const dataBlob = new Blob([data], { type: "video/mp4" });
+      const dataBlob = new Blob([data as unknown as BlobPart], { type: "video/mp4" });
+
+
+
       const objectUrl = URL.createObjectURL(dataBlob);
 
       const a = document.createElement("a");
@@ -530,13 +534,45 @@ export default function EditVideo() {
   // ─── Render ──────────────────────────────────────────────────────
   return (
     <div
-      className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-background text-foreground overflow-hidden"
+      className="flex flex-col md:flex-row h-[calc(100vh-theme(spacing.16))] w-full bg-background text-foreground overflow-hidden relative"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
+      {/* ══════════ MOBILE SIDEBAR TOGGLE ══════════ */}
+      <button
+        className="md:hidden fixed bottom-4 right-4 z-[60] w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-2xl flex items-center justify-center transition-transform active:scale-90"
+        onClick={() => setMobileSidebarOpen((v) => !v)}
+        aria-label="Toggle editor panel"
+      >
+        {mobileSidebarOpen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+        ) : (
+          <Settings2 size={20} />
+        )}
+      </button>
+
+      {/* ══════════ MOBILE SIDEBAR BACKDROP ══════════ */}
+      {mobileSidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
       {/* ══════════ LEFT SIDEBAR ══════════ */}
-      <aside className="w-72 border-r border-border/60 bg-card/80 backdrop-blur-xl flex flex-col">
+      <aside className={cn(
+        "border-border/60 bg-card/80 backdrop-blur-xl flex flex-col transition-transform duration-300 ease-in-out",
+        // Desktop: normal left sidebar
+        "md:w-72 md:border-r md:relative md:translate-y-0 md:translate-x-0 md:overflow-hidden",
+        // Mobile: fixed bottom sheet
+        "fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t max-h-[75vh] overflow-y-auto",
+        mobileSidebarOpen ? "translate-y-0" : "translate-y-full",
+      )}>
+        {/* Mobile drag handle pill */}
+        <div className="md:hidden flex justify-center pt-2 pb-1 flex-shrink-0">
+          <div className="w-10 h-1 rounded-full bg-border" />
+        </div>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-border/60">
           <div className="flex items-center gap-2 mb-3">
@@ -1025,7 +1061,7 @@ export default function EditVideo() {
       </aside>
 
       {/* ══════════ CANVAS / PREVIEW ══════════ */}
-      <main className="flex-1 flex items-center justify-center relative p-8">
+      <main className="flex-1 flex items-center justify-center relative p-2 sm:p-4 md:p-8 min-h-0">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-[0.03]" style={{
           backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
@@ -1054,7 +1090,7 @@ export default function EditVideo() {
               ref={videoRef}
               src={videoSrc}
               controls
-              className={cn("max-h-[80vh] w-auto block rounded-lg", cropMode && "opacity-50")}
+              className={cn("max-h-[50vh] md:max-h-[80vh] w-auto max-w-full block rounded-lg", cropMode && "opacity-50")}
               crossOrigin="anonymous"
             />
 
@@ -1208,5 +1244,20 @@ export default function EditVideo() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function EditVideo() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-full border-4 border-muted border-t-primary animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading editor…</p>
+        </div>
+      </div>
+    }>
+      <EditVideoInner />
+    </Suspense>
   );
 }

@@ -63,12 +63,12 @@ export function InstagramVideoForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-accent/20 my-4 flex w-full max-w-2xl flex-col items-center rounded-lg border px-4 pb-16 pt-8 shadow-md sm:px-8"
+        className="bg-accent/20 my-4 flex w-full max-w-2xl flex-col items-center rounded-lg border px-4 pb-12 pt-6 shadow-md sm:px-8 sm:pb-16 sm:pt-8"
       >
         <div className="mb-2 h-6 w-full px-2 text-start text-red-500">
           {httpError}
         </div>
-        <div className="relative mb-6 flex w-full flex-col items-center gap-4 sm:flex-row">
+        <div className="relative mb-6 flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:gap-4">
           <FormField
             control={form.control}
             name="postUrl"
@@ -90,7 +90,7 @@ export function InstagramVideoForm() {
           <Button
             disabled={isPending}
             type="submit"
-            className="right-1 top-1 w-full sm:absolute sm:w-fit"
+            className="h-12 w-full sm:absolute sm:right-1 sm:top-1 sm:h-10 sm:w-fit"
           >
             {isPending ? (
               <Loader2 className="mr-2 animate-spin" />
@@ -99,8 +99,6 @@ export function InstagramVideoForm() {
             )}
             Download
           </Button>
-
-
         </div>
 
         {form.watch("postUrl") && (

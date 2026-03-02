@@ -38,12 +38,12 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="h-8 w-full bg-background/50 text-center text-secondary-foreground">
-      <div className="flex items-center justify-between border-t border-input px-4 py-2">
-        <div aria-label="Disclaimer" className="text-sm font-semibold">
+    <footer className="h-auto w-full bg-background/50 text-center text-secondary-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-1 border-t border-input px-4 py-2">
+        <div aria-label="Disclaimer" className="text-xs sm:text-sm font-semibold text-center sm:text-left">
           We are not affiliated with Instagram or Meta
         </div>
-        <div className="flex items-center gap-1 text-sm">
+        <div className="flex items-center gap-1 text-xs sm:text-sm">
           <Link href="/terms-of-service" className="hover:underline">
             Terms of Service
           </Link>
