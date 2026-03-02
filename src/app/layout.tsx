@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <AdSense pId="9504654793147997"/>
+        <AdSense pId="9504654793147997" />
       </head>
       <body
         className={cn(
@@ -45,7 +45,7 @@ export default function RootLayout({
         >
           <ReactQueryProvider>
             <Navbar />
-            <main className="relative h-[calc(100vh-6rem)] overflow-y-auto px-2 sm:px-4">
+            <main className="relative h-[calc(100vh-3.5rem)] overflow-hidden">
               {children}
             </main>
             <Footer />
